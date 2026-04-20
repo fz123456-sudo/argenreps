@@ -262,7 +262,7 @@ export default function CatalogPublic() {
                           }}
                         >
                           🔍 Ver QC
-                        </a>
+                        <button>
                       )}
                     </div>
                   </div>
