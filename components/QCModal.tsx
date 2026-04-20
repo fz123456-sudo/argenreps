@@ -8,15 +8,32 @@ type Props = {
   onClose: () => void
 }
 
+function getMallInfo(link: string): { mallType: string; itemId: string } | null {
+  const m1688 = link.match(/item-1688-(\d+)/)
+  if (m1688) return { mallType: '1688', itemId: m1688[1] }
+  const mWeidian = link.match(/item-micro-(\d+)/)
+  if (mWeidian) return { mallType: 'WD', itemId: mWeidian[1] }
+  const mTaobao = link.match(/\/item-(\d+)\.html/)
+  if (mTaobao) return { mallType: 'TB', itemId: mTaobao[1] }
+  return null
+}
+
 export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
-  const [fotos, setFotos]   = useState<string[]>([])
+  const [fotos, setFotos]     = useState<string[]>([])
   const [loading, setLoading] = useState(true)
   const [current, setCurrent] = useState(0)
 
   useEffect(() => {
-    fetch(`/api/qc?url=${encodeURIComponent(linkCssbuy)}`)
+    const info = getMallInfo(linkCssbuy)
+    if (!info) { setLoading(false); return }
+
+    fetch(`https://findqc.com/api/goods/detail?mallType=${info.mallType}&itemId=${info.itemId}`)
       .then(r => r.json())
-      .then(d => { setFotos(d.fotos || []); setLoading(false) })
+      .then(d => {
+        const qcList = d?.data?.data?.qcList || []
+        setFotos(qcList.map((q: any) => q.url).filter(Boolean))
+        setLoading(false)
+      })
       .catch(() => setLoading(false))
   }, [linkCssbuy])
 
@@ -35,7 +52,6 @@ export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
         borderRadius: 16, width: '100%', maxWidth: 480,
         maxHeight: '90vh', overflow: 'hidden', display: 'flex', flexDirection: 'column'
       }}>
-        {/* Header */}
         <div style={{
           padding: '14px 18px', borderBottom: '1px solid var(--border)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between'
@@ -51,7 +67,6 @@ export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
           }}>✕</button>
         </div>
 
-        {/* Content */}
         <div style={{ flex: 1, overflow: 'hidden', position: 'relative' }}>
           {loading ? (
             <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)' }}>
@@ -60,18 +75,16 @@ export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
           ) : fotos.length === 0 ? (
             <div style={{ padding: 60, textAlign: 'center', color: 'var(--muted)' }}>
               <div style={{ fontSize: 36, marginBottom: 12 }}>📷</div>
-              <p>No hay fotos de QC disponibles para este producto</p>
+              <p>No hay fotos de QC disponibles</p>
             </div>
           ) : (
             <div>
-              {/* Foto principal */}
               <div style={{ position: 'relative', background: '#000' }}>
                 <img
-                  src={`/api/imagen?url=${encodeURIComponent(fotos[current])}`}
+                  src={fotos[current]}
                   alt={`QC ${current + 1}`}
                   style={{ width: '100%', maxHeight: 360, objectFit: 'contain', display: 'block' }}
                 />
-                {/* Contador */}
                 <div style={{
                   position: 'absolute', top: 10, right: 10,
                   background: 'rgba(0,0,0,0.7)', borderRadius: 6,
@@ -79,7 +92,6 @@ export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
                 }}>
                   {current + 1} / {fotos.length}
                 </div>
-                {/* Prev/Next */}
                 {fotos.length > 1 && <>
                   <button onClick={() => setCurrent(i => (i - 1 + fotos.length) % fotos.length)} style={{
                     position: 'absolute', left: 10, top: '50%', transform: 'translateY(-50%)',
@@ -93,19 +105,13 @@ export default function QCModal({ linkCssbuy, nombre, onClose }: Props) {
                   }}>›</button>
                 </>}
               </div>
-
-              {/* Thumbnails */}
               {fotos.length > 1 && (
                 <div style={{
                   display: 'flex', gap: 6, padding: '10px 14px',
                   overflowX: 'auto', background: 'var(--bg3)'
                 }}>
                   {fotos.map((f, i) => (
-                    <img
-                      key={i}
-                      src={`/api/imagen?url=${encodeURIComponent(f)}`}
-                      alt={`thumb ${i + 1}`}
-                      onClick={() => setCurrent(i)}
+                    <img key={i} src={f} alt={`thumb ${i + 1}`} onClick={() => setCurrent(i)}
                       style={{
                         width: 56, height: 56, objectFit: 'cover', borderRadius: 6,
                         cursor: 'pointer', flexShrink: 0,
