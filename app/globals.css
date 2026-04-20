@@ -62,7 +62,26 @@ nav {
 
 .grid-wrap { padding: 24px 28px 48px; max-width: 1400px; margin: 0 auto; }
 .results-count { font-size: 13px; color: var(--muted); margin-bottom: 16px; }
-.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
+.grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+
+@media (max-width: 768px) {
+  .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+  .grid-wrap { padding: 16px 14px 48px; }
+  .filters { padding: 10px 14px; }
+  nav { padding: 0 14px; height: auto; min-height: 60px; flex-wrap: wrap; gap: 8px; padding: 10px 14px; }
+  .nav-links { gap: 6px; }
+  .nav-logo { font-size: 20px; }
+  .hero { padding: 28px 14px 20px; }
+  .hero h1 { font-size: clamp(28px, 8vw, 48px); }
+  .hero p { font-size: 13px; }
+  .admin-wrap { padding: 16px 14px; }
+  .admin-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .cats { gap: 6px; }
+  .cat { font-size: 11px; padding: 4px 10px; }
+  .card-name { font-size: 11px; }
+  .card-price { font-size: 17px; }
+  .card-btn { font-size: 11px; padding: 6px; }
+}
 
 .card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s; display: flex; flex-direction: column; }
 .card:hover { transform: translateY(-4px); border-color: rgba(117,170,219,0.4); box-shadow: 0 8px 24px rgba(0,0,0,0.3); }
