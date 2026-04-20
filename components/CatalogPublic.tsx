@@ -149,12 +149,16 @@ export default function CatalogPublic() {
         </div>
       )}
 
-      <div className="hero">
-        <h1>{config.hero_title_1}<br /><span>{config.hero_title_2}</span></h1>
-        <p>{config.site_description}</p>
-        <div className="hero-links">
-          <a href={config.agent_url} target="_blank" rel="noopener noreferrer" className="btn-primary">{config.btn_agent_text}</a>
-          <a href={config.discord_url} target="_blank" rel="noopener noreferrer" className="btn-secondary">{config.btn_discord_text}</a>
+      <div style={{ padding: '20px 28px 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12, borderBottom: '1px solid var(--border)' }}>
+        <div>
+          <h1 style={{ fontFamily: 'Bebas Neue, sans-serif', fontSize: 28, letterSpacing: 3, color: 'var(--white)', lineHeight: 1 }}>
+            SPREADSHEET <span style={{ color: 'var(--accent)' }}>ARGENBUY</span>
+          </h1>
+          <p style={{ color: 'var(--muted)', fontSize: 12, marginTop: 4 }}>{productos.length} productos · CSSBuy</p>
+        </div>
+        <div style={{ display: 'flex', gap: 8 }}>
+          <a href={config.agent_url} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '7px 14px', fontSize: 12 }}>{config.btn_agent_text}</a>
+          <a href={config.discord_url} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '7px 14px', fontSize: 12 }}>{config.btn_discord_text}</a>
         </div>
       </div>
 
