@@ -5,6 +5,7 @@ import { supabase, type Producto, getFindQCUrl } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
 import WelcomePopup from './WelcomePopup'
 import QCModal from './QCModal'
+import QCButton from './QCButton'
 
 const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
 
@@ -37,7 +38,7 @@ export default function CatalogPublic() {
   useEffect(() => {
     setFavs(getFavs())
     Promise.all([
-      supabase.from('productos').select('*').eq('link_activo', true),
+      supabase.from('productos').select('*').eq('link_activo', true).limit(2000),
       getConfig()
     ]).then(([{ data }, cfg]) => {
       setProductos(data || [])
