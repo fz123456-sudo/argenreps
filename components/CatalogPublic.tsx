@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useMemo, useEffect, useCallback } from 'react'
-import { supabase, type Producto } from '@/lib/supabase'
+import { supabase, type Producto, getFindQCUrl } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
 import WelcomePopup from './WelcomePopup'
 
@@ -35,7 +35,7 @@ export default function CatalogPublic() {
   useEffect(() => {
     setFavs(getFavs())
     Promise.all([
-     supabase.from('productos').select('*').eq('link_activo', true).limit(2000),
+      supabase.from('productos').select('*').eq('link_activo', true),
       getConfig()
     ]).then(([{ data }, cfg]) => {
       setProductos(data || [])
@@ -240,6 +240,24 @@ export default function CatalogPublic() {
                       >
                         {config.btn_buy_text}
                       </a>
+                      {getFindQCUrl(p.link_cssbuy) && (
+                        <a
+                          href={getFindQCUrl(p.link_cssbuy)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{
+                            display: 'block', textAlign: 'center',
+                            background: 'transparent',
+                            border: '1px solid rgba(117,170,219,0.3)',
+                            color: 'var(--muted)', borderRadius: 7,
+                            padding: '5px', fontSize: 11, fontWeight: 600,
+                            textDecoration: 'none', marginTop: 5,
+                            transition: 'all 0.2s'
+                          }}
+                        >
+                          🔍 Ver QC
+                        </a>
+                      )}
                     </div>
                   </div>
                 )

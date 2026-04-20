@@ -21,3 +21,21 @@ export const CATEGORIAS = [
   'Remeras', 'Pantalones', 'Abrigos', 'Zapatillas',
   'Accesorios', 'Shorts', 'Conjuntos', 'Girls'
 ]
+
+export function getFindQCUrl(linkCssbuy: string): string {
+  if (!linkCssbuy) return ''
+  
+  // 1688: item-1688-ID
+  const m1688 = linkCssbuy.match(/item-1688-(\d+)/)
+  if (m1688) return `https://findqc.com/detail/T1688/${m1688[1]}`
+  
+  // Weidian: item-micro-ID
+  const mWeidian = linkCssbuy.match(/item-micro-(\d+)/)
+  if (mWeidian) return `https://findqc.com/detail/TWD/${mWeidian[1]}`
+  
+  // Taobao: item-ID
+  const mTaobao = linkCssbuy.match(/\/item-(\d+)\.html/)
+  if (mTaobao) return `https://findqc.com/detail/TTB/${mTaobao[1]}`
+  
+  return ''
+}

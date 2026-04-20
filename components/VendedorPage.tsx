@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { supabase } from '@/lib/supabase'
+import { supabase, getFindQCUrl } from '@/lib/supabase'
 import FotoCarrusel from './FotoCarrusel'
 
 type Vendedor = {
@@ -179,6 +179,14 @@ export default function VendedorPage({ slug }: { slug: string }) {
                 <div className="card-cat">{a.categoria}</div>
                 <div className="card-name" title={a.nombre}>{a.nombre}</div>
                 <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
+                {getFindQCUrl(href) && (
+                  <a href={getFindQCUrl(href)} target="_blank" rel="noopener noreferrer" style={{
+                    display: 'block', textAlign: 'center', background: 'transparent',
+                    border: '1px solid rgba(117,170,219,0.3)', color: 'var(--muted)',
+                    borderRadius: 7, padding: '5px', fontSize: 11, fontWeight: 600,
+                    textDecoration: 'none', marginTop: 5
+                  }}>🔍 Ver QC</a>
+                )}
               </div>
             </div>
             )})}
