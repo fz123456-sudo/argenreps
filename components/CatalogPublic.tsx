@@ -99,9 +99,9 @@ export default function CatalogPublic() {
       <WelcomePopup />
 
       <nav>
-        <div className="nav-logo">
+        <a href="/" style={{ textDecoration: 'none' }} className="nav-logo">
           {config.site_name}<span className="nav-badge">ARG</span>
-        </div>
+        </a>
         <div className="nav-links">
           <a href="/vendedores" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>Vendedores</a>
           <button
