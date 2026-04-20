@@ -4,6 +4,7 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import { supabase, type Producto, getFindQCUrl } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
 import WelcomePopup from './WelcomePopup'
+import QCModal from './QCModal'
 
 const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
 
@@ -30,6 +31,7 @@ export default function CatalogPublic() {
   const [showFavs, setShowFavs]     = useState(false)
   const [favs, setFavs]             = useState<number[]>([])
   const [loading, setLoading]       = useState(true)
+  const [qcProducto, setQcProducto] = useState<Producto | null>(null)
   const [banner, setBanner]         = useState('')
 
   useEffect(() => {
@@ -280,3 +282,4 @@ export default function CatalogPublic() {
     </>
   )
 }
+// Note: QCModal and button replacement done inline below

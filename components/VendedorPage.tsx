@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { supabase, getFindQCUrl } from '@/lib/supabase'
+import QCModal from './QCModal'
 import FotoCarrusel from './FotoCarrusel'
 
 type Vendedor = {
@@ -32,6 +33,7 @@ export default function VendedorPage({ slug }: { slug: string }) {
   const [search, setSearch]     = useState('')
   const [loading, setLoading]   = useState(true)
   const [notFound, setNotFound] = useState(false)
+  const [qcAlbum, setQcAlbum] = useState<Album | null>(null)
 
   useEffect(() => {
     supabase
@@ -192,6 +194,14 @@ export default function VendedorPage({ slug }: { slug: string }) {
             )})}
         </div>
       </div>
+
+      {qcAlbum && (
+        <QCModal
+          linkCssbuy={qcAlbum.link_cssbuy}
+          nombre={qcAlbum.nombre}
+          onClose={() => setQcAlbum(null)}
+        />
+      )}
 
       <footer>
         <p>© {new Date().getFullYear()} <strong>ArgenBuy</strong></p>
