@@ -3,6 +3,9 @@
 import { useState, useMemo, useEffect, useCallback } from 'react'
 import { supabase, type Producto } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
+import WelcomePopup from './WelcomePopup'
+
+const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
 
 type SortOption = 'nuevos' | 'precio_asc' | 'precio_desc'
 
@@ -93,6 +96,8 @@ export default function CatalogPublic() {
 
   return (
     <>
+      <WelcomePopup />
+
       <nav>
         <div className="nav-logo">
           {config.site_name}<span className="nav-badge">ARG</span>
@@ -111,7 +116,33 @@ export default function CatalogPublic() {
         </div>
       </nav>
 
-      {/* Banner */}
+      {/* Banner de registro — siempre visible */}
+      <div style={{
+        background: 'linear-gradient(90deg, #1a3a5c, #0d1b2a)',
+        borderBottom: '1px solid var(--accent)',
+        padding: '10px 20px',
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        gap: 16, flexWrap: 'wrap', textAlign: 'center'
+      }}>
+        <span style={{ fontSize: 13, color: 'var(--white)' }}>
+          🎁 <strong>40% OFF en service fee para siempre</strong> — Registrate en CSSBuy con nuestro link
+        </span>
+        <a
+          href={REGISTER_URL}
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{
+            background: 'var(--accent)', color: 'var(--bg)',
+            padding: '5px 14px', borderRadius: 6,
+            fontSize: 12, fontWeight: 700, textDecoration: 'none',
+            whiteSpace: 'nowrap'
+          }}
+        >
+          Registrarme →
+        </a>
+      </div>
+
+      {/* Banner editable desde admin */}
       {banner && (
         <div style={{ background: 'var(--accent)', color: 'var(--bg)', textAlign: 'center', padding: '10px 20px', fontSize: 13, fontWeight: 600 }}>
           {banner}

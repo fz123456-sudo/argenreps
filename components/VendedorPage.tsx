@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { supabase } from '@/lib/supabase'
+import FotoCarrusel from './FotoCarrusel'
 
 type Vendedor = {
   id: number
@@ -18,7 +19,9 @@ type Album = {
   id: number
   nombre: string
   imagen: string
+  fotos: string[]
   link: string
+  link_cssbuy: string
   categoria: string
 }
 
@@ -43,10 +46,19 @@ export default function VendedorPage({ slug }: { slug: string }) {
           .from('vendedor_albums')
           .select('*')
           .eq('vendedor_id', data.id)
+          .neq('link_cssbuy', '')
           .order('categoria')
       })
       .then(res => {
-        if (res) setAlbums(res.data || [])
+        if (res) {
+          const data = (res.data || []).map((a: any) => ({
+            ...a,
+            fotos: (() => {
+              try { return JSON.parse(a.fotos || '[]') } catch { return a.imagen ? [a.imagen] : [] }
+            })()
+          }))
+          setAlbums(data)
+        }
         setLoading(false)
       })
   }, [slug])
@@ -58,6 +70,7 @@ export default function VendedorPage({ slug }: { slug: string }) {
 
   const filtered = useMemo(() => {
     return albums.filter(a => {
+      if (!a.link_cssbuy) return false
       const matchCat = categoria === 'Todos' || a.categoria === categoria
       const q = search.toLowerCase()
       const matchSearch = !q || a.nombre.toLowerCase().includes(q)
@@ -155,29 +168,25 @@ export default function VendedorPage({ slug }: { slug: string }) {
         <div className="grid">
           {filtered.length === 0 ? (
             <div className="empty"><div style={{ fontSize: 40, marginBottom: 12 }}>📂</div><p>No hay álbumes</p></div>
-          ) : filtered.map(a => (
-            <a key={a.id} href={a.link} target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
-              <div className="card">
-                <div className="card-img-wrap">
-                  {a.imagen ? (
-                    <img src={a.imagen} alt={a.nombre} className="card-img" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                  ) : (
-                    <div className="card-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)', fontSize: 32 }}>🖼</div>
-                  )}
-                </div>
-                <div className="card-body">
-                  <div className="card-cat">{a.categoria}</div>
-                  <div className="card-name" title={a.nombre}>{a.nombre}</div>
-                  <div className="card-btn" style={{ textAlign: 'center' }}>Ver en Yupoo →</div>
-                </div>
+          ) : filtered.map(a => {
+            const href = a.link_cssbuy
+            return (
+            <div key={a.id} className="card">
+              <div className="card-img-wrap">
+                <FotoCarrusel fotos={a.fotos} nombre={a.nombre} />
               </div>
-            </a>
-          ))}
+              <div className="card-body">
+                <div className="card-cat">{a.categoria}</div>
+                <div className="card-name" title={a.nombre}>{a.nombre}</div>
+                <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
+              </div>
+            </div>
+            )})}
         </div>
       </div>
 
       <footer>
-        <p>© {new Date().getFullYear()} <strong>ArgenReps</strong></p>
+        <p>© {new Date().getFullYear()} <strong>ArgenBuy</strong></p>
         <p style={{ marginTop: 6 }}><a href="/">Catálogo</a> · <a href="/vendedores">Vendedores</a></p>
       </footer>
     </>
