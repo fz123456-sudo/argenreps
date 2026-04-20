@@ -49,7 +49,7 @@ export async function GET(req: NextRequest) {
     }
 
     // Deduplicar
-    const unique = [...new Set(fotos)]
+    const unique = Array.from(new Set(fotos))
 
     return NextResponse.json({ fotos: unique }, {
       headers: { 'Cache-Control': 'public, max-age=3600' }
