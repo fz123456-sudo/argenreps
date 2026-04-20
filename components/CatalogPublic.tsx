@@ -35,7 +35,7 @@ export default function CatalogPublic() {
   useEffect(() => {
     setFavs(getFavs())
     Promise.all([
-      supabase.from('productos').select('*').eq('link_activo', true),
+     supabase.from('productos').select('*').eq('link_activo', true).limit(2000),
       getConfig()
     ]).then(([{ data }, cfg]) => {
       setProductos(data || [])
