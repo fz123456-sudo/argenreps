@@ -27,7 +27,7 @@ const SECTIONS: Section[] = [
   {
     title: '🔗 Links',
     fields: [
-      { key: 'agent_name',   label: 'Nombre del agente (ej: CSBuy)', type: 'text' },
+      { key: 'agent_name',   label: 'Nombre del agente (ej: CSSBuy)', type: 'text' },
       { key: 'agent_url',    label: 'URL del agente',     type: 'url' },
       { key: 'discord_url',  label: 'URL de Discord',     type: 'url' },
     ]
