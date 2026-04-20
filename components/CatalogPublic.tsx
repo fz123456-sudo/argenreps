@@ -247,22 +247,20 @@ export default function CatalogPublic() {
                         {config.btn_buy_text}
                       </a>
                       {getFindQCUrl(p.link_cssbuy) && (
-                        <a
-                          href={getFindQCUrl(p.link_cssbuy)}
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          onClick={() => setQcProducto(p)}
                           style={{
-                            display: 'block', textAlign: 'center',
+                            display: 'block', width: '100%', textAlign: 'center',
                             background: 'transparent',
                             border: '1px solid rgba(117,170,219,0.3)',
                             color: 'var(--muted)', borderRadius: 7,
                             padding: '5px', fontSize: 11, fontWeight: 600,
-                            textDecoration: 'none', marginTop: 5,
-                            transition: 'all 0.2s'
+                            cursor: 'pointer', marginTop: 5,
+                            fontFamily: 'DM Sans, sans-serif'
                           }}
                         >
                           🔍 Ver QC
-                        </a>
+                        </button>
                       )}
                     </div>
                   </div>
@@ -273,6 +271,14 @@ export default function CatalogPublic() {
         )}
       </div>
 
+      {qcProducto && (
+        <QCModal
+          linkCssbuy={qcProducto.link_cssbuy}
+          nombre={qcProducto.nombre}
+          onClose={() => setQcProducto(null)}
+        />
+      )}
+
       <footer>
         <p>{config.footer_text}</p>
         <p style={{ marginTop: 6 }}>
@@ -282,4 +288,3 @@ export default function CatalogPublic() {
     </>
   )
 }
-// Note: QCModal and button replacement done inline below
