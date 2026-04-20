@@ -50,14 +50,21 @@ export default function QCVerifier() {
     setLog([])
 
     // Obtener productos sin verificar
-    const { data } = await supabase
-      .from('productos')
-      .select('id, nombre, link_cssbuy')
-      .eq('link_activo', true)
-      .is('tiene_qc', null)
-      .limit(2000)
-
-    const productos = data || []
+    // Obtener todos los productos sin verificar (paginando)
+    let productos: any[] = []
+    let offset = 0
+    while (true) {
+      const { data } = await supabase
+        .from('productos')
+        .select('id, nombre, link_cssbuy')
+        .eq('link_activo', true)
+        .is('tiene_qc', null)
+        .range(offset, offset + 999)
+      if (!data || data.length === 0) break
+      productos = [...productos, ...data]
+      if (data.length < 1000) break
+      offset += 1000
+    }
     setTotal(productos.length)
     addLog(`Verificando ${productos.length} productos...`)
 
