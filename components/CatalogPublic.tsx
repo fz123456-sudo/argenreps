@@ -247,7 +247,7 @@ export default function CatalogPublic() {
                       >
                         {config.btn_buy_text}
                       </a>
-                      {p.tiene_qc && getFindQCUrl(p.link_cssbuy) && (
+                      {getFindQCUrl(p.link_cssbuy) && (
                         <button
                           onClick={() => setQcProducto(p)}
                           style={{
