@@ -22,6 +22,7 @@ type Album = {
   nombre: string
   imagen: string
   fotos: string[]
+  fotos_qc: string[]
   link: string
   link_cssbuy: string
   categoria: string
@@ -58,6 +59,9 @@ export default function VendedorPage({ slug }: { slug: string }) {
             ...a,
             fotos: (() => {
               try { return JSON.parse(a.fotos || '[]') } catch { return a.imagen ? [a.imagen] : [] }
+            })(),
+            fotos_qc: (() => {
+              try { return JSON.parse(a.fotos_qc || '[]') } catch { return [] }
             })()
           }))
           setAlbums(data)
@@ -178,7 +182,7 @@ export default function VendedorPage({ slug }: { slug: string }) {
                 <div className="card-name" title={a.nombre}>{a.nombre}</div>
                 <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
                 <QCButton
-                  linkCssbuy={a.link_cssbuy}
+                  fotosQc={a.fotos_qc}
                   onOpen={(fotos) => setQcAlbum({ album: a, fotos })}
                 />
               </div>
