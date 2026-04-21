@@ -3,7 +3,7 @@ import { supabase } from './supabase'
 export type Config = Record<string, string>
 
 export const defaultConfig: Config = {
-  site_name: 'ArgenReps',
+  site_name: 'ArgenBuy',
   site_slogan: 'El catálogo argentino de reps',
   site_description: 'Más de 900 productos seleccionados con links directos a CSBuy.',
   discord_url: 'https://discord.gg/argenreps',
