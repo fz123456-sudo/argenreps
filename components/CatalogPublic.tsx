@@ -84,7 +84,7 @@ export default function CatalogPublic() {
   }, [])
 
   const categorias = useMemo(() => {
-    const cats = Array.from(new Set(productos.map(p => p.categoria))).sort()
+    const cats = Array.from(new Set(productos.map(p => p.categoria).filter(Boolean))).sort()
     return ['Todos', 'Favoritos', ...cats]
   }, [productos])
 
