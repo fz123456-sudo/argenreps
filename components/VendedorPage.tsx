@@ -121,11 +121,6 @@ export default function VendedorPage({ slug }: { slug: string }) {
             </div>
             <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 12 }}>{vendedor.descripcion}</p>
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              {vendedor.yupoo_url && (
-                <a href={vendedor.yupoo_url} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>
-                  🖼 Ver en Yupoo
-                </a>
-              )}
               {vendedor.discord && (
                 <a href={vendedor.discord} target="_blank" rel="noopener noreferrer" style={{ background: '#5865F2', color: '#fff', padding: '6px 14px', borderRadius: 8, fontSize: 12, fontWeight: 600, textDecoration: 'none' }}>
                   Discord
