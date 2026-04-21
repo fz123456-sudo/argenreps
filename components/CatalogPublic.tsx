@@ -9,6 +9,12 @@ import QCButton from './QCButton'
 
 const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
 
+function proxyImg(src: string): string {
+  if (!src) return ''
+  if (src.includes('yupoo.com')) return `/api/imagen?url=${encodeURIComponent(src)}`
+  return src
+}
+
 type SortOption = 'nuevos' | 'precio_asc' | 'precio_desc'
 
 function getFavs(): number[] {
@@ -236,7 +242,7 @@ export default function CatalogPublic() {
                   <div className="card" key={p.id}>
                     <div className="card-img-wrap">
                       {p.imagen
-                        ? <img src={p.imagen} alt={p.nombre} className="card-img" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
+                        ? <img src={proxyImg(p.imagen)} alt={p.nombre} className="card-img" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                         : <div className="card-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>Sin imagen</div>
                       }
                       {p.destacado && <div className="featured-badge">★ DESTACADO</div>}
