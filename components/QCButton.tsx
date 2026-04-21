@@ -7,17 +7,49 @@ type Props = {
   onOpen: (fotos: string[]) => void
 }
 
+function getShopUrl(link: string): string | null {
+  const mWeidian = link.match(/item-micro-(\d+)/)
+  if (mWeidian) return `https://weidian.com/item.html?itemID=${mWeidian[1]}`
+  const mTaobao = link.match(/\/item-(\d+)\.html/)
+  if (mTaobao) return `https://item.taobao.com/item.htm?id=${mTaobao[1]}`
+  const m1688 = link.match(/item-1688-(\d+)/)
+  if (m1688) return `https://detail.1688.com/offer/${m1688[1]}.html`
+  return null
+}
+
+async function fetchQcFotos(linkCssbuy: string): Promise<string[]> {
+  const shopUrl = getShopUrl(linkCssbuy)
+  if (!shopUrl) return []
+
+  // Llamada directa desde el browser — usa cookies propias de Cloudflare
+  try {
+    const res = await fetch(
+      `https://apiv2.ezfinds.xyz/reviews?qcLink=${encodeURIComponent(shopUrl)}&limit=20&offset=0`,
+      { credentials: 'include' }
+    )
+    if (!res.ok) return []
+    const data = await res.json()
+    const fotos: string[] = []
+    for (const review of (data?.results || [])) {
+      for (const img of (review?.images || [])) {
+        const src = typeof img === 'string' ? img : img?.url || ''
+        if (src) fotos.push(src)
+      }
+    }
+    return fotos
+  } catch {
+    return []
+  }
+}
+
 export default function QCButton({ linkCssbuy, onOpen }: Props) {
   const [fotos, setFotos] = useState<string[] | null>(null)
 
   useEffect(() => {
     if (!linkCssbuy) return
-    fetch(`/api/qc?url=${encodeURIComponent(linkCssbuy)}`)
-      .then(r => r.json())
-      .then(d => {
-        if (d.fotos?.length > 0) setFotos(d.fotos)
-      })
-      .catch(() => {})
+    fetchQcFotos(linkCssbuy).then(f => {
+      if (f.length > 0) setFotos(f)
+    })
   }, [linkCssbuy])
 
   if (!fotos) return null
