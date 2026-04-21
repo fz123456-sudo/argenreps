@@ -37,11 +37,25 @@ export default function CatalogPublic() {
 
   useEffect(() => {
     setFavs(getFavs())
-    Promise.all([
-      supabase.from('productos').select('*').eq('link_activo', true).limit(2000),
-      getConfig()
-    ]).then(([{ data }, cfg]) => {
-      setProductos(data || [])
+    async function fetchAll() {
+      const PAGE = 1000
+      let all: Producto[] = []
+      let from = 0
+      while (true) {
+        const { data } = await supabase
+          .from('productos')
+          .select('*')
+          .eq('link_activo', true)
+          .range(from, from + PAGE - 1)
+        if (!data || data.length === 0) break
+        all = all.concat(data)
+        if (data.length < PAGE) break
+        from += PAGE
+      }
+      return all
+    }
+    Promise.all([fetchAll(), getConfig()]).then(([all, cfg]) => {
+      setProductos(all)
       setConfigState(cfg)
       setBanner(cfg.banner || '')
       setLoading(false)
