@@ -1,10 +1,10 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 type Props = {
   linkCssbuy: string
-  onOpen: () => void
+  onOpen: (fotos: string[]) => void
 }
 
 function getMallInfo(link: string): { mallType: string; itemId: string } | null {
@@ -18,46 +18,39 @@ function getMallInfo(link: string): { mallType: string; itemId: string } | null 
 }
 
 export default function QCButton({ linkCssbuy, onOpen }: Props) {
-  const [state, setState] = useState<'idle' | 'checking' | 'yes' | 'no'>('idle')
+  const [fotos, setFotos] = useState<string[] | null>(null)
 
-  const handleHover = async () => {
-    if (state !== 'idle') return
-    setState('checking')
-
+  useEffect(() => {
     const info = getMallInfo(linkCssbuy)
-    if (!info) { setState('no'); return }
+    if (!info) return
 
-    try {
-      const res = await fetch(
-        `https://findqc.com/api/goods/detail?mallType=${info.mallType}&itemId=${info.itemId}`
-      )
-      const data = await res.json()
-      const goods = data?.data?.data
-      const hasQc = goods?.hasRegularQc === 'YES' || goods?.hasPremiumQc === 'YES'
-      setState(hasQc ? 'yes' : 'no')
-    } catch {
-      setState('no')
-    }
-  }
+    fetch(`https://findqc.com/api/goods/detail?mallType=${info.mallType}&itemId=${info.itemId}`)
+      .then(r => r.json())
+      .then(d => {
+        const goods = d?.data?.data
+        const hasQc = goods?.hasRegularQc === 'YES' || goods?.hasPremiumQc === 'YES'
+        if (!hasQc) return
+        const lista = (goods?.qcList || []).map((q: any) => q.url).filter(Boolean)
+        if (lista.length > 0) setFotos(lista)
+      })
+      .catch(() => {})
+  }, [linkCssbuy])
 
-  if (state === 'no') return null
+  if (!fotos) return null
 
   return (
     <button
-      onMouseEnter={handleHover}
-      onClick={state === 'yes' ? onOpen : undefined}
+      onClick={() => onOpen(fotos)}
       style={{
         display: 'block', width: '100%', textAlign: 'center',
         background: 'transparent',
-        border: `1px solid ${state === 'yes' ? 'var(--accent)' : 'rgba(117,170,219,0.3)'}`,
-        color: state === 'yes' ? 'var(--accent)' : 'var(--muted)',
+        border: '1px solid var(--accent)',
+        color: 'var(--accent)',
         borderRadius: 7, padding: '5px', fontSize: 11, fontWeight: 600,
-        cursor: state === 'yes' ? 'pointer' : 'default',
-        marginTop: 5, fontFamily: 'DM Sans, sans-serif',
-        transition: 'all 0.3s'
+        cursor: 'pointer', marginTop: 5, fontFamily: 'DM Sans, sans-serif',
       }}
     >
-      {state === 'checking' ? '⏳ Verificando...' : '🔍 Ver QC'}
+      🔍 Ver QC
     </button>
   )
 }

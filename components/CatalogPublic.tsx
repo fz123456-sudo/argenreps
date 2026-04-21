@@ -38,7 +38,7 @@ export default function CatalogPublic() {
   const [showFavs, setShowFavs]     = useState(false)
   const [favs, setFavs]             = useState<number[]>([])
   const [loading, setLoading]       = useState(true)
-  const [qcProducto, setQcProducto] = useState<Producto | null>(null)
+  const [qcProducto, setQcProducto] = useState<{ producto: Producto; fotos: string[] } | null>(null)
   const [banner, setBanner]         = useState('')
 
   useEffect(() => {
@@ -259,22 +259,10 @@ export default function CatalogPublic() {
                       >
                         {config.btn_buy_text}
                       </a>
-                      {getFindQCUrl(p.link_cssbuy) && (
-                        <button
-                          onClick={() => setQcProducto(p)}
-                          style={{
-                            display: 'block', width: '100%', textAlign: 'center',
-                            background: 'transparent',
-                            border: '1px solid rgba(117,170,219,0.3)',
-                            color: 'var(--muted)', borderRadius: 7,
-                            padding: '5px', fontSize: 11, fontWeight: 600,
-                            cursor: 'pointer', marginTop: 5,
-                            fontFamily: 'DM Sans, sans-serif'
-                          }}
-                        >
-                          🔍 Ver QC
-                        </button>
-                      )}
+                      <QCButton
+                        linkCssbuy={p.link_cssbuy}
+                        onOpen={(fotos) => setQcProducto({ producto: p, fotos })}
+                      />
                     </div>
                   </div>
                 )
@@ -286,8 +274,8 @@ export default function CatalogPublic() {
 
       {qcProducto && (
         <QCModal
-          linkCssbuy={qcProducto.link_cssbuy}
-          nombre={qcProducto.nombre}
+          fotos={qcProducto.fotos}
+          nombre={qcProducto.producto.nombre}
           onClose={() => setQcProducto(null)}
         />
       )}

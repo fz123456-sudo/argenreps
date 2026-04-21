@@ -1,8 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
-import { supabase, getFindQCUrl } from '@/lib/supabase'
+import { supabase } from '@/lib/supabase'
 import QCModal from './QCModal'
+import QCButton from './QCButton'
 import FotoCarrusel from './FotoCarrusel'
 
 type Vendedor = {
@@ -33,7 +34,7 @@ export default function VendedorPage({ slug }: { slug: string }) {
   const [search, setSearch]     = useState('')
   const [loading, setLoading]   = useState(true)
   const [notFound, setNotFound] = useState(false)
-  const [qcAlbum, setQcAlbum] = useState<Album | null>(null)
+  const [qcAlbum, setQcAlbum] = useState<{ album: Album; fotos: string[] } | null>(null)
 
   useEffect(() => {
     supabase
@@ -176,14 +177,10 @@ export default function VendedorPage({ slug }: { slug: string }) {
                 <div className="card-cat">{a.categoria}</div>
                 <div className="card-name" title={a.nombre}>{a.nombre}</div>
                 <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
-                {getFindQCUrl(href) && (
-                  <button onClick={() => setQcAlbum(a)} style={{
-                    display: 'block', width: '100%', textAlign: 'center', background: 'transparent',
-                    border: '1px solid rgba(117,170,219,0.3)', color: 'var(--muted)',
-                    borderRadius: 7, padding: '5px', fontSize: 11, fontWeight: 600,
-                    cursor: 'pointer', marginTop: 5, fontFamily: 'DM Sans, sans-serif'
-                  }}>🔍 Ver QC</button>
-                )}
+                <QCButton
+                  linkCssbuy={a.link_cssbuy}
+                  onOpen={(fotos) => setQcAlbum({ album: a, fotos })}
+                />
               </div>
             </div>
             )})}
@@ -192,8 +189,8 @@ export default function VendedorPage({ slug }: { slug: string }) {
 
       {qcAlbum && (
         <QCModal
-          linkCssbuy={qcAlbum.link_cssbuy}
-          nombre={qcAlbum.nombre}
+          fotos={qcAlbum.fotos}
+          nombre={qcAlbum.album.nombre}
           onClose={() => setQcAlbum(null)}
         />
       )}
