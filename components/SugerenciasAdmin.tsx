@@ -21,7 +21,7 @@ type ScrapedData = {
   fotos: string[]
 }
 
-const emptyForm = { nombre: '', precio: 0, categoria: 'Remeras', marca: '', imagen: '', link_cssbuy: '' }
+const emptyForm = { nombre: '', precio: 0, categoria: 'Recomendados', marca: '', imagen: '', link_cssbuy: '' }
 
 const FUENTE_LABEL: Record<string, string> = {
   '1688': '1688',
@@ -104,6 +104,7 @@ export default function SugerenciasAdmin() {
       link_cssbuy: form.link_cssbuy,
       destacado: false,
       estrella: false,
+      link_activo: true,
     }])
     if (errProd) { showToast('Error al crear el producto', 'err'); setGuardando(false); return }
 

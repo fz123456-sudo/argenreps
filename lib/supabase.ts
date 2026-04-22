@@ -21,7 +21,7 @@ export type Producto = {
 }
 
 export const CATEGORIAS = [
-  'Remeras', 'Pantalones', 'Abrigos', 'Zapatillas',
+  'Recomendados', 'Remeras', 'Pantalones', 'Abrigos', 'Zapatillas',
   'Accesorios', 'Shorts', 'Conjuntos', 'Girls'
 ]
 
