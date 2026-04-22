@@ -28,8 +28,18 @@ export default function FotoCarrusel({ fotos, nombre }: { fotos: string[], nombr
     setCurrent(i => (i + 1) % fotos.length)
   }
 
+  // Precargar fotos adyacentes para navegacion instantanea
+  const preload = [
+    fotos[(current + 1) % fotos.length],
+    fotos[(current + 2) % fotos.length],
+    fotos[(current - 1 + fotos.length) % fotos.length],
+  ].filter((f, i, arr) => f !== fotos[current] && arr.indexOf(f) === i)
+
   return (
     <div style={{ position: 'relative', aspectRatio: '1', overflow: 'hidden' }}>
+      {preload.map(f => (
+        <img key={f} src={proxyImg(f)} alt="" style={{ display: 'none' }} />
+      ))}
       <img
         src={proxyImg(fotos[current])}
         alt={`${nombre} ${current + 1}`}
