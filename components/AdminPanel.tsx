@@ -7,6 +7,7 @@ import ConfigPanel from './ConfigPanel'
 import StatsPanel from './StatsPanel'
 import VendedoresAdmin from './VendedoresAdmin'
 import QCVerifier from './QCVerifier'
+import SugerenciasAdmin from './SugerenciasAdmin'
 
 const emptyForm: Omit<Producto, 'id' | 'created_at'> = {
   nombre: '', precio: 0, categoria: 'Remeras',
@@ -18,7 +19,8 @@ export default function AdminPanel() {
   const [password, setPassword]     = useState('')
   const [loginError, setLoginError] = useState('')
   const [loginLoading, setLoginLoading] = useState(false)
-  const [tab, setTab] = useState<'productos' | 'vendedores' | 'stats' | 'qc' | 'config'>('productos')
+  const [tab, setTab] = useState<'productos' | 'vendedores' | 'stats' | 'qc' | 'config' | 'sugerencias'>('productos')
+  const [pendientesSug, setPendientesSug] = useState(0)
   const [productos, setProductos]   = useState<Producto[]>([])
   const [search, setSearch]         = useState('')
   const [loading, setLoading]       = useState(true)
@@ -45,7 +47,12 @@ export default function AdminPanel() {
     setLoading(false)
   }
 
-  useEffect(() => { if (authed) cargar() }, [authed])
+  useEffect(() => {
+    if (!authed) return
+    cargar()
+    supabase.from('sugerencias').select('id', { count: 'exact', head: true }).eq('estado', 'pendiente')
+      .then(({ count }) => setPendientesSug(count || 0))
+  }, [authed])
 
   const login = async () => {
     setLoginLoading(true)
@@ -134,6 +141,9 @@ export default function AdminPanel() {
           <button className={tab === 'stats' ? 'btn-primary' : 'btn-secondary'} style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => setTab('stats')}>📊 Stats</button>
           <button className={tab === 'qc' ? 'btn-primary' : 'btn-secondary'} style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => setTab('qc')}>🔍 QC</button>
           <button className={tab === 'config' ? 'btn-primary' : 'btn-secondary'} style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => setTab('config')}>⚙️ Config</button>
+          <button className={tab === 'sugerencias' ? 'btn-primary' : 'btn-secondary'} style={{ padding: '6px 14px', fontSize: 12, position: 'relative' }} onClick={() => setTab('sugerencias')}>
+            💡 Sugerencias{pendientesSug > 0 && <span style={{ marginLeft: 6, background: '#e53935', color: '#fff', borderRadius: 10, padding: '1px 6px', fontSize: 10 }}>{pendientesSug}</span>}
+          </button>
           <a href="/" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>Ver sitio</a>
           {tab === 'productos' && <>
             <button className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }} onClick={() => setShowImport(true)}>↑ Importar CSV</button>
@@ -146,6 +156,7 @@ export default function AdminPanel() {
       {tab === 'stats' && <StatsPanel />}
       {tab === 'vendedores' && <VendedoresAdmin />}
       {tab === 'qc' && <QCVerifier />}
+      {tab === 'sugerencias' && <SugerenciasAdmin />}
 
       {tab === 'productos' && (
         <div className="admin-wrap">

@@ -5,6 +5,7 @@ import { supabase, type Producto, getFindQCUrl } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
 import WelcomePopup from './WelcomePopup'
 import QCModal from './QCModal'
+import SugerenciasForm from './SugerenciasForm'
 import QCButton from './QCButton'
 
 const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
@@ -47,6 +48,7 @@ export default function CatalogPublic() {
   const [favs, setFavs]               = useState<number[]>([])
   const [loading, setLoading]         = useState(true)
   const [qcProducto, setQcProducto]   = useState<{ producto: Producto; fotos: string[] } | null>(null)
+  const [showSugerencia, setShowSugerencia] = useState(false)
   const [banner, setBanner]           = useState('')
   const [votedProducts, setVotedProducts] = useState<Set<number>>(new Set())
   const [votingId, setVotingId]       = useState<number | null>(null)
@@ -217,6 +219,17 @@ export default function CatalogPublic() {
             <option value="precio_asc">Precio: menor a mayor</option>
             <option value="precio_desc">Precio: mayor a menor</option>
           </select>
+
+          <button
+            onClick={() => setShowSugerencia(true)}
+            style={{
+              background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 10,
+              padding: '10px 14px', color: 'var(--white)', fontSize: 13, cursor: 'pointer',
+              fontFamily: 'DM Sans, sans-serif', whiteSpace: 'nowrap',
+            }}
+          >
+            💡 Sugerir producto
+          </button>
         </div>
 
         {/* Categorías */}
@@ -301,6 +314,8 @@ export default function CatalogPublic() {
           onClose={() => setQcProducto(null)}
         />
       )}
+
+      {showSugerencia && <SugerenciasForm onClose={() => setShowSugerencia(false)} />}
 
       <footer>
         <p>{config.footer_text}</p>
