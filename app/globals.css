@@ -140,5 +140,4 @@ footer a { color: var(--accent); text-decoration: none; }
 
 .banner-cssbuy { display: block; line-height: 0; transition: opacity 0.2s; }
 .banner-cssbuy:hover { opacity: 0.92; }
-.banner-cssbuy img { width: 100%; height: 160px; object-fit: cover; object-position: center 40%; display: block; }
-@media (max-width: 768px) { .banner-cssbuy img { height: 100px; } }
+.banner-cssbuy img { width: 100%; height: auto; display: block; }
