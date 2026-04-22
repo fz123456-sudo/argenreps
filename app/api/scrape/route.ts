@@ -103,11 +103,11 @@ async function fetchYupoo(url: string) {
     }
 
     // Extraer fotos del álbum (data-src de imágenes Yupoo)
-    const photoMatches = html.matchAll(/data-src="(https?:\/\/[^"]*(?:photo\.yupoo\.com|r2\.dev)[^"]*(?:\.jpg|\.jpeg|\.png|\.webp)[^"]*)"/gi)
+    const photoRe = /data-src="(https?:\/\/[^"]*(?:photo\.yupoo\.com|r2\.dev)[^"]*(?:\.jpg|\.jpeg|\.png|\.webp)[^"]*)"/gi
     const fotos: string[] = []
-    for (const m of photoMatches) {
-      if (!fotos.includes(m[1])) fotos.push(m[1])
-      if (fotos.length >= 10) break
+    let pm: RegExpExecArray | null
+    while ((pm = photoRe.exec(html)) !== null && fotos.length < 10) {
+      if (!fotos.includes(pm[1])) fotos.push(pm[1])
     }
     if (fotos.length > 0) {
       result.fotos = fotos
