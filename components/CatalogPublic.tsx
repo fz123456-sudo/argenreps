@@ -249,7 +249,7 @@ export default function CatalogPublic() {
                     <div className="card-body">
                       <div className="card-cat">{p.categoria}</div>
                       <div className="card-name" title={p.nombre}>{p.nombre}</div>
-                      <div className="card-price">${p.precio.toFixed(2)}</div>
+                      <div className="card-price">¥{p.precio.toFixed(2)}</div>
                       <a
                         href={p.link_cssbuy}
                         target="_blank"
