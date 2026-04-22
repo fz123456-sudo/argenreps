@@ -11,7 +11,7 @@ import SugerenciasAdmin from './SugerenciasAdmin'
 
 const emptyForm: Omit<Producto, 'id' | 'created_at'> = {
   nombre: '', precio: 0, categoria: 'Remeras',
-  marca: '', imagen: '', link_cssbuy: '', destacado: false, estrella: false
+  marca: '', imagen: '', link_cssbuy: '', link_cssbuy_2: '', destacado: false, estrella: false
 }
 
 export default function AdminPanel() {
@@ -78,7 +78,7 @@ export default function AdminPanel() {
 
   const openAdd  = () => { setForm(emptyForm); setEditId(null); setModal('add') }
   const openEdit = (p: Producto) => {
-    setForm({ nombre: p.nombre, precio: p.precio, categoria: p.categoria, marca: p.marca, imagen: p.imagen, link_cssbuy: p.link_cssbuy, destacado: p.destacado, estrella: p.estrella ?? false })
+    setForm({ nombre: p.nombre, precio: p.precio, categoria: p.categoria, marca: p.marca, imagen: p.imagen, link_cssbuy: p.link_cssbuy, link_cssbuy_2: p.link_cssbuy_2 || '', destacado: p.destacado, estrella: p.estrella ?? false })
     setEditId(p.id!)
     setModal('edit')
   }
@@ -240,7 +240,8 @@ export default function AdminPanel() {
             </div>
             <div className="form-group"><label>Marca</label><input className="form-input" value={form.marca} onChange={e => setForm(f => ({ ...f, marca: e.target.value }))} /></div>
             <div className="form-group"><label>URL Imagen</label><input className="form-input" value={form.imagen} onChange={e => setForm(f => ({ ...f, imagen: e.target.value }))} /></div>
-            <div className="form-group"><label>Link CSBuy</label><input className="form-input" value={form.link_cssbuy} onChange={e => setForm(f => ({ ...f, link_cssbuy: e.target.value }))} /></div>
+            <div className="form-group"><label>Link CSSBuy (Parte 1)</label><input className="form-input" value={form.link_cssbuy} onChange={e => setForm(f => ({ ...f, link_cssbuy: e.target.value }))} /></div>
+            <div className="form-group"><label>Link CSSBuy (Parte 2 — opcional, para conjuntos)</label><input className="form-input" value={form.link_cssbuy_2 || ''} onChange={e => setForm(f => ({ ...f, link_cssbuy_2: e.target.value }))} /></div>
             <div className="form-group">
               <label className="form-checkbox">
                 <input type="checkbox" checked={form.destacado} onChange={e => setForm(f => ({ ...f, destacado: e.target.checked }))} />

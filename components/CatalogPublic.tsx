@@ -280,15 +280,22 @@ export default function CatalogPublic() {
                       <div className="card-cat">{p.categoria}</div>
                       <div className="card-name" title={p.nombre}>{p.nombre}</div>
                       <div className="card-price">${p.precio.toFixed(2)}</div>
-                      <a
-                        href={p.link_cssbuy}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="card-btn"
-                        onClick={() => handleClick(p.id!)}
-                      >
-                        {config.btn_buy_text}
-                      </a>
+                      {p.link_cssbuy_2 ? (
+                        <div style={{ display: 'flex', gap: 6 }}>
+                          <a href={p.link_cssbuy} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ flex: 1, textAlign: 'center', fontSize: 11 }} onClick={() => handleClick(p.id!)}>Parte 1 →</a>
+                          <a href={p.link_cssbuy_2} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ flex: 1, textAlign: 'center', fontSize: 11 }}>Parte 2 →</a>
+                        </div>
+                      ) : (
+                        <a
+                          href={p.link_cssbuy}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="card-btn"
+                          onClick={() => handleClick(p.id!)}
+                        >
+                          {config.btn_buy_text}
+                        </a>
+                      )}
                       <button
                         onClick={() => handleVote(p.id!)}
                         disabled={votedProducts.has(p.id!) || votingId === p.id}

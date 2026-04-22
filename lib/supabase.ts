@@ -13,6 +13,7 @@ export type Producto = {
   marca: string
   imagen: string
   link_cssbuy: string
+  link_cssbuy_2?: string
   destacado: boolean
   estrella?: boolean
   tiene_qc?: boolean
