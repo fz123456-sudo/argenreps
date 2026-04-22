@@ -145,31 +145,10 @@ export default function CatalogPublic() {
         </div>
       </nav>
 
-      {/* Banner de registro — siempre visible */}
-      <div style={{
-        background: 'linear-gradient(90deg, #1a3a5c, #0d1b2a)',
-        borderBottom: '1px solid var(--accent)',
-        padding: '10px 20px',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        gap: 16, flexWrap: 'wrap', textAlign: 'center'
-      }}>
-        <span style={{ fontSize: 13, color: 'var(--white)' }}>
-          🎁 <strong>40% OFF en service fee para siempre</strong> — Registrate en CSSBuy con nuestro link
-        </span>
-        <a
-          href={REGISTER_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{
-            background: 'var(--accent)', color: 'var(--bg)',
-            padding: '5px 14px', borderRadius: 6,
-            fontSize: 12, fontWeight: 700, textDecoration: 'none',
-            whiteSpace: 'nowrap'
-          }}
-        >
-          Registrarme →
-        </a>
-      </div>
+      {/* Banner CSSBuy */}
+      <a href={REGISTER_URL} target="_blank" rel="noopener noreferrer" className="banner-cssbuy">
+        <img src="/banner-cssbuy.png" alt="40% OFF en service fee para siempre — Registrate en CSSBuy" />
+      </a>
 
       {/* Banner editable desde admin */}
       {banner && (
@@ -217,7 +196,7 @@ export default function CatalogPublic() {
 
       <div className="grid-wrap">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'var(--muted)' }}>Cargando productos...</div>
+          <div className="loading-text" style={{ textAlign: 'center', padding: 60, color: 'var(--muted)', fontSize: 14 }}>Cargando productos...</div>
         ) : (
           <>
             <div className="results-count">
