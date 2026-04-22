@@ -25,6 +25,7 @@ type Album = {
   fotos_qc: string[]
   link: string
   link_cssbuy: string
+  link_cssbuy_2: string
   categoria: string
 }
 
@@ -62,7 +63,8 @@ export default function VendedorPage({ slug }: { slug: string }) {
             })(),
             fotos_qc: (() => {
               try { return JSON.parse(a.fotos_qc || '[]') } catch { return [] }
-            })()
+            })(),
+            link_cssbuy_2: a.link_cssbuy_2 || ''
           }))
           setAlbums(data)
         }
@@ -180,7 +182,14 @@ export default function VendedorPage({ slug }: { slug: string }) {
               <div className="card-body">
                 <div className="card-cat">{a.categoria}</div>
                 <div className="card-name" title={a.nombre}>{a.nombre}</div>
-                <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
+                {a.link_cssbuy_2 ? (
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    <a href={a.link_cssbuy} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ flex: 1, textAlign: 'center', fontSize: 11 }}>Parte 1 →</a>
+                    <a href={a.link_cssbuy_2} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ flex: 1, textAlign: 'center', fontSize: 11 }}>Parte 2 →</a>
+                  </div>
+                ) : (
+                  <a href={href} target="_blank" rel="noopener noreferrer" className="card-btn" style={{ textAlign: 'center' }}>Comprar en CSSBuy →</a>
+                )}
                 <QCButton
                   fotosQc={a.fotos_qc}
                   onOpen={(fotos) => setQcAlbum({ album: a, fotos })}
