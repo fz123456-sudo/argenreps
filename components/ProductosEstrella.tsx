@@ -1,7 +1,7 @@
 'use client'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
-import { supabase, type Producto, getFindQCUrl } from '@/lib/supabase'
+import { useState, useEffect, useCallback } from 'react'
+import { supabase, type Producto } from '@/lib/supabase'
 import { getConfig, type Config, defaultConfig } from '@/lib/config'
 import WelcomePopup from './WelcomePopup'
 import QCModal from './QCModal'
@@ -15,8 +15,6 @@ function proxyImg(src: string): string {
   return src
 }
 
-type SortOption = 'nuevos' | 'precio_asc' | 'precio_desc'
-
 function getFavs(): number[] {
   try { return JSON.parse(localStorage.getItem('favs') || '[]') } catch { return [] }
 }
@@ -27,43 +25,27 @@ function toggleFav(id: number): number[] {
   return next
 }
 
-export default function CatalogPublic() {
+export default function ProductosEstrella() {
   const [productos, setProductos]   = useState<Producto[]>([])
-  const [config, setConfigState]    = useState<Config>(defaultConfig)
-  const [categoria, setCategoria]   = useState('Todos')
-  const [search, setSearch]         = useState('')
-  const [sort, setSort]             = useState<SortOption>('nuevos')
-  const [minPrecio, setMinPrecio]   = useState('')
-  const [maxPrecio, setMaxPrecio]   = useState('')
-  const [showFavs, setShowFavs]     = useState(false)
-  const [favs, setFavs]             = useState<number[]>([])
+  const [config, setConfig]         = useState<Config>(defaultConfig)
   const [loading, setLoading]       = useState(true)
+  const [favs, setFavs]             = useState<number[]>([])
   const [qcProducto, setQcProducto] = useState<{ producto: Producto; fotos: string[] } | null>(null)
-  const [banner, setBanner]         = useState('')
 
   useEffect(() => {
     setFavs(getFavs())
     async function fetchAll() {
-      const PAGE = 1000
-      let all: Producto[] = []
-      let from = 0
-      while (true) {
-        const { data } = await supabase
-          .from('productos')
-          .select('*')
-          .eq('link_activo', true)
-          .range(from, from + PAGE - 1)
-        if (!data || data.length === 0) break
-        all = all.concat(data)
-        if (data.length < PAGE) break
-        from += PAGE
-      }
-      return all
+      const { data } = await supabase
+        .from('productos')
+        .select('*')
+        .eq('estrella', true)
+        .eq('link_activo', true)
+        .order('id', { ascending: false })
+      return data || []
     }
     Promise.all([fetchAll(), getConfig()]).then(([all, cfg]) => {
       setProductos(all)
-      setConfigState(cfg)
-      setBanner(cfg.banner || '')
+      setConfig(cfg)
       setLoading(false)
     })
   }, [])
@@ -83,40 +65,6 @@ export default function CatalogPublic() {
     await supabase.from('clicks').insert([{ producto_id: productoId }])
   }, [])
 
-  const categorias = useMemo(() => {
-    const cats = Array.from(new Set(productos.map(p => p.categoria).filter(Boolean))).sort()
-    return ['Todos', 'Favoritos', ...cats]
-  }, [productos])
-
-  const countFor = (cat: string) => {
-    if (cat === 'Todos') return productos.length
-    if (cat === 'Favoritos') return favs.length
-    return productos.filter(p => p.categoria === cat).length
-  }
-
-  const filtered = useMemo(() => {
-    let list = [...productos]
-
-    if (categoria === 'Favoritos') {
-      list = list.filter(p => favs.includes(p.id!))
-    } else if (categoria !== 'Todos') {
-      list = list.filter(p => p.categoria === categoria)
-    }
-
-    if (search) {
-      const q = search.toLowerCase()
-      list = list.filter(p => p.nombre.toLowerCase().includes(q) || p.marca.toLowerCase().includes(q))
-    }
-
-    if (minPrecio) list = list.filter(p => p.precio >= parseFloat(minPrecio))
-    if (maxPrecio) list = list.filter(p => p.precio <= parseFloat(maxPrecio))
-
-    if (sort === 'precio_asc')  list.sort((a, b) => a.precio - b.precio)
-    if (sort === 'precio_desc') list.sort((a, b) => b.precio - a.precio)
-
-    return list
-  }, [productos, categoria, search, sort, minPrecio, maxPrecio, favs])
-
   return (
     <>
       <WelcomePopup />
@@ -126,26 +74,15 @@ export default function CatalogPublic() {
           <a href="/" style={{ textDecoration: 'none' }} className="nav-logo">
             {config.site_name}<span className="nav-badge">ARG</span>
           </a>
-          {!loading && (
-            <span style={{ color: 'var(--muted)', fontSize: 12 }}>{productos.length} productos</span>
-          )}
         </div>
         <div className="nav-links">
-          <a href="/estrella" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>⭐ Estrella</a>
+          <a href="/estrella" className="btn-primary" style={{ padding: '6px 14px', fontSize: 12 }}>⭐ Productos Estrella</a>
           <a href="/vendedores" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>Vendedores</a>
-          <button
-            onClick={() => { setCategoria('Favoritos'); setShowFavs(true) }}
-            className="btn-secondary"
-            style={{ padding: '6px 14px', fontSize: 12, position: 'relative' }}
-          >
-            ♥ Favs {favs.length > 0 && <span style={{ background: 'var(--accent)', color: 'var(--bg)', borderRadius: 10, padding: '0 5px', fontSize: 10, marginLeft: 4 }}>{favs.length}</span>}
-          </button>
           <a href={config.agent_url} target="_blank" rel="noopener noreferrer" className="btn-secondary" style={{ padding: '6px 14px', fontSize: 12 }}>{config.agent_name}</a>
           <a href={config.discord_url} target="_blank" rel="noopener noreferrer" className="btn-primary" style={{ padding: '6px 14px', fontSize: 12 }}>{config.btn_discord_text}</a>
         </div>
       </nav>
 
-      {/* Banner de registro — siempre visible */}
       <div style={{
         background: 'linear-gradient(90deg, #1a3a5c, #0d1b2a)',
         borderBottom: '1px solid var(--accent)',
@@ -171,65 +108,26 @@ export default function CatalogPublic() {
         </a>
       </div>
 
-      {/* Banner editable desde admin */}
-      {banner && (
-        <div style={{ background: 'var(--accent)', color: 'var(--bg)', textAlign: 'center', padding: '10px 20px', fontSize: 13, fontWeight: 600 }}>
-          {banner}
-        </div>
-      )}
-
-      <div className="filters">
-        {/* Búsqueda */}
-        <div style={{ display: 'flex', gap: 10, marginBottom: 12, flexWrap: 'wrap' }}>
-          <div className="search-wrap" style={{ flex: 1, minWidth: 200, margin: 0 }}>
-            <span className="search-icon">🔍</span>
-            <input type="text" className="search-input" placeholder="Buscar por nombre o marca..." value={search} onChange={e => setSearch(e.target.value)} />
-          </div>
-
-          {/* Precio min/max */}
-          <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-            <input type="number" className="search-input" placeholder="$ Min" value={minPrecio} onChange={e => setMinPrecio(e.target.value)} style={{ width: 80, paddingLeft: 12 }} />
-            <span style={{ color: 'var(--muted)', fontSize: 12 }}>—</span>
-            <input type="number" className="search-input" placeholder="$ Max" value={maxPrecio} onChange={e => setMaxPrecio(e.target.value)} style={{ width: 80, paddingLeft: 12 }} />
-          </div>
-
-          {/* Ordenar */}
-          <select
-            value={sort}
-            onChange={e => setSort(e.target.value as SortOption)}
-            style={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--white)', fontSize: 13, fontFamily: 'DM Sans, sans-serif', outline: 'none' }}
-          >
-            <option value="nuevos">Más nuevos</option>
-            <option value="precio_asc">Precio: menor a mayor</option>
-            <option value="precio_desc">Precio: mayor a menor</option>
-          </select>
-        </div>
-
-        {/* Categorías */}
-        <div className="cats">
-          {categorias.map(cat => (
-            <button key={cat} className={`cat${categoria === cat ? ' active' : ''}`} onClick={() => setCategoria(cat)}>
-              {cat === 'Favoritos' ? '♥ ' : ''}{cat} <span style={{ opacity: 0.6 }}>{countFor(cat)}</span>
-            </button>
-          ))}
-        </div>
+      <div style={{ padding: '24px 20px 0', maxWidth: 1200, margin: '0 auto' }}>
+        <h2 style={{ fontSize: 22, fontWeight: 700, marginBottom: 4 }}>⭐ Productos Estrella</h2>
+        <p style={{ color: 'var(--muted)', fontSize: 13, marginBottom: 24 }}>
+          Selección curada por el equipo de ArgenBuy — los mejores productos que recomendamos.
+        </p>
       </div>
 
       <div className="grid-wrap">
         {loading ? (
-          <div style={{ textAlign: 'center', padding: 60, color: 'var(--muted)' }}>Cargando productos...</div>
+          <div style={{ textAlign: 'center', padding: 60, color: 'var(--muted)' }}>Cargando...</div>
+        ) : productos.length === 0 ? (
+          <div className="empty">
+            <div style={{ fontSize: 40, marginBottom: 12 }}>⭐</div>
+            <p>Todavía no hay productos estrella.</p>
+          </div>
         ) : (
           <>
-            <div className="results-count">
-              {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
-              {search && ` para "${search}"`}
-              {categoria !== 'Todos' && ` en ${categoria}`}
-              {(minPrecio || maxPrecio) && ` · $${minPrecio || '0'} — $${maxPrecio || '∞'}`}
-            </div>
+            <div className="results-count">{productos.length} producto{productos.length !== 1 ? 's' : ''} recomendados</div>
             <div className="grid">
-              {filtered.length === 0 ? (
-                <div className="empty"><div style={{ fontSize: 40, marginBottom: 12 }}>📦</div><p>No hay productos</p></div>
-              ) : filtered.map(p => {
+              {productos.map(p => {
                 const isFav = favs.includes(p.id!)
                 return (
                   <div className="card" key={p.id}>
@@ -238,8 +136,7 @@ export default function CatalogPublic() {
                         ? <img src={proxyImg(p.imagen)} alt={p.nombre} className="card-img" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
                         : <div className="card-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>Sin imagen</div>
                       }
-                      {p.destacado && <div className="featured-badge">★ DESTACADO</div>}
-                      {/* Botón favorito */}
+                      <div className="featured-badge">⭐ ESTRELLA</div>
                       <button
                         onClick={() => handleFav(p.id!)}
                         style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isFav ? '#ff6b6b' : '#fff', transition: 'all 0.2s' }}

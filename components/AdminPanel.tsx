@@ -10,7 +10,7 @@ import QCVerifier from './QCVerifier'
 
 const emptyForm: Omit<Producto, 'id' | 'created_at'> = {
   nombre: '', precio: 0, categoria: 'Remeras',
-  marca: '', imagen: '', link_cssbuy: '', destacado: false
+  marca: '', imagen: '', link_cssbuy: '', destacado: false, estrella: false
 }
 
 export default function AdminPanel() {
@@ -71,7 +71,7 @@ export default function AdminPanel() {
 
   const openAdd  = () => { setForm(emptyForm); setEditId(null); setModal('add') }
   const openEdit = (p: Producto) => {
-    setForm({ nombre: p.nombre, precio: p.precio, categoria: p.categoria, marca: p.marca, imagen: p.imagen, link_cssbuy: p.link_cssbuy, destacado: p.destacado })
+    setForm({ nombre: p.nombre, precio: p.precio, categoria: p.categoria, marca: p.marca, imagen: p.imagen, link_cssbuy: p.link_cssbuy, destacado: p.destacado, estrella: p.estrella ?? false })
     setEditId(p.id!)
     setModal('edit')
   }
@@ -171,6 +171,7 @@ export default function AdminPanel() {
                     <th>Marca</th>
                     <th>Link</th>
                     <th>Destacado</th>
+                    <th>Estrella</th>
                     <th>Acciones</th>
                   </tr>
                 </thead>
@@ -188,6 +189,18 @@ export default function AdminPanel() {
                         </span>
                       </td>
                       <td>{p.destacado ? '⭐' : '—'}</td>
+                      <td>
+                        <button
+                          onClick={async () => {
+                            await supabase.from('productos').update({ estrella: !p.estrella }).eq('id', p.id)
+                            cargar()
+                          }}
+                          style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: 18, opacity: p.estrella ? 1 : 0.25 }}
+                          title={p.estrella ? 'Quitar de estrella' : 'Marcar como estrella'}
+                        >
+                          ⭐
+                        </button>
+                      </td>
                       <td>
                         <div className="admin-actions">
                           <button className="btn-edit" onClick={() => openEdit(p)}>Editar</button>
@@ -221,6 +234,12 @@ export default function AdminPanel() {
               <label className="form-checkbox">
                 <input type="checkbox" checked={form.destacado} onChange={e => setForm(f => ({ ...f, destacado: e.target.checked }))} />
                 Producto destacado
+              </label>
+            </div>
+            <div className="form-group">
+              <label className="form-checkbox">
+                <input type="checkbox" checked={form.estrella ?? false} onChange={e => setForm(f => ({ ...f, estrella: e.target.checked }))} />
+                ⭐ Producto estrella
               </label>
             </div>
             <div className="modal-footer">

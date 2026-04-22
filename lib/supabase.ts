@@ -14,6 +14,7 @@ export type Producto = {
   imagen: string
   link_cssbuy: string
   destacado: boolean
+  estrella?: boolean
   tiene_qc?: boolean
   created_at?: string
 }
