@@ -279,7 +279,7 @@ export default function CatalogPublic() {
                         disabled={votedProducts.has(p.id!) || votingId === p.id}
                         className={`vote-btn${votedProducts.has(p.id!) ? ' voted' : ''}`}
                       >
-                        ▲ {p.voto_count || 0}
+                        ▲ Recomendar {p.voto_count ? `· ${p.voto_count}` : ''}
                       </button>
                       <QCButton
                         fotosQc={[]}
