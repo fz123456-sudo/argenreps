@@ -18,6 +18,7 @@ type ScrapedData = {
   nombre: string
   precio: number
   imagen: string
+  fotos: string[]
 }
 
 const emptyForm = { nombre: '', precio: 0, categoria: 'Remeras', marca: '', imagen: '', link_cssbuy: '' }
@@ -26,7 +27,14 @@ const FUENTE_LABEL: Record<string, string> = {
   '1688': '1688',
   taobao: 'Taobao',
   weidian: 'Weidian',
+  yupoo: 'Yupoo',
   desconocido: '?',
+}
+
+function proxyImg(src: string) {
+  if (!src) return ''
+  if (src.includes('yupoo.com')) return `/api/imagen?url=${encodeURIComponent(src)}`
+  return src
 }
 
 export default function SugerenciasAdmin() {
@@ -36,6 +44,7 @@ export default function SugerenciasAdmin() {
   const [aprobando, setAprobando] = useState<Sugerencia | null>(null)
   const [scraping, setScraping] = useState(false)
   const [form, setForm] = useState(emptyForm)
+  const [fotosYupoo, setFotosYupoo] = useState<string[]>([])
   const [guardando, setGuardando] = useState(false)
   const [toast, setToast] = useState<{ msg: string; type: 'ok' | 'err' } | null>(null)
 
@@ -58,6 +67,7 @@ export default function SugerenciasAdmin() {
 
   const abrirAprobacion = async (s: Sugerencia) => {
     setAprobando(s)
+    setFotosYupoo([])
     setForm({ ...emptyForm, link_cssbuy: s.url })
     setScraping(true)
     try {
@@ -68,6 +78,7 @@ export default function SugerenciasAdmin() {
       })
       if (res.ok) {
         const data: ScrapedData = await res.json()
+        setFotosYupoo(data.fotos || [])
         setForm({
           nombre: data.nombre || '',
           precio: data.precio || 0,
@@ -257,10 +268,33 @@ export default function SugerenciasAdmin() {
               </select>
             </div>
 
-            {form.imagen && (
+            {/* Galería de fotos Yupoo para elegir imagen principal */}
+            {fotosYupoo.length > 0 && (
+              <div style={{ marginBottom: 16 }}>
+                <label className="form-label">Fotos del álbum — click para usar como imagen</label>
+                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 6 }}>
+                  {fotosYupoo.map((f, i) => (
+                    <img
+                      key={i}
+                      src={proxyImg(f)}
+                      alt={`foto ${i + 1}`}
+                      onClick={() => setForm(prev => ({ ...prev, imagen: f }))}
+                      style={{
+                        width: 64, height: 64, objectFit: 'cover', borderRadius: 6, cursor: 'pointer',
+                        border: form.imagen === f ? '2px solid var(--accent)' : '2px solid var(--border)',
+                        transition: 'border-color 0.15s',
+                      }}
+                      onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {form.imagen && fotosYupoo.length === 0 && (
               <div style={{ marginBottom: 16 }}>
                 <img
-                  src={form.imagen} alt=""
+                  src={proxyImg(form.imagen)} alt=""
                   style={{ height: 80, width: 80, objectFit: 'cover', borderRadius: 8, border: '1px solid var(--border)' }}
                   onError={e => { (e.target as HTMLImageElement).style.display = 'none' }}
                 />
