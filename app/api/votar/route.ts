@@ -7,9 +7,9 @@ const WINDOW_MS = 10 * 60 * 1000
 
 setInterval(() => {
   const now = Date.now()
-  for (const [ip, entry] of rateMap) {
+  rateMap.forEach((entry, ip) => {
     if (now > entry.resetAt) rateMap.delete(ip)
-  }
+  })
 }, 5 * 60 * 1000)
 
 function checkRate(ip: string): boolean {
