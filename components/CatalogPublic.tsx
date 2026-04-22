@@ -260,7 +260,7 @@ export default function CatalogPublic() {
                         {config.btn_buy_text}
                       </a>
                       <QCButton
-                        linkCssbuy={p.link_cssbuy}
+                        fotosQc={[]}
                         onOpen={(fotos) => setQcProducto({ producto: p, fotos })}
                       />
                     </div>
