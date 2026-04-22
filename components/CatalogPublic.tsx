@@ -65,6 +65,7 @@ export default function CatalogPublic() {
           .from('productos')
           .select('*')
           .eq('link_activo', true)
+          .order('id', { ascending: false })
           .range(from, from + PAGE - 1)
         if (!data || data.length === 0) break
         all = all.concat(data)
@@ -146,6 +147,7 @@ export default function CatalogPublic() {
     if (minPrecio) list = list.filter(p => p.precio >= parseFloat(minPrecio))
     if (maxPrecio) list = list.filter(p => p.precio <= parseFloat(maxPrecio))
 
+    if (sort === 'nuevos')      list.sort((a, b) => (b.id || 0) - (a.id || 0))
     if (sort === 'precio_asc')  list.sort((a, b) => a.precio - b.precio)
     if (sort === 'precio_desc') list.sort((a, b) => b.precio - a.precio)
     if (sort === 'votos')       list.sort((a, b) => (b.voto_count || 0) - (a.voto_count || 0))
