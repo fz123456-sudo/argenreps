@@ -104,7 +104,7 @@ export default function CatalogPublic() {
         setVotedProducts(prev => {
           const next = new Set(prev)
           next.add(productId)
-          localStorage.setItem('voted_products', JSON.stringify([...next]))
+          localStorage.setItem('voted_products', JSON.stringify(Array.from(next)))
           return next
         })
       }
