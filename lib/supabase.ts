@@ -16,6 +16,7 @@ export type Producto = {
   destacado: boolean
   estrella?: boolean
   tiene_qc?: boolean
+  voto_count?: number
   created_at?: string
 }
 

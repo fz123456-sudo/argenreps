@@ -15,7 +15,7 @@ function proxyImg(src: string): string {
   return src
 }
 
-type SortOption = 'nuevos' | 'precio_asc' | 'precio_desc'
+type SortOption = 'nuevos' | 'precio_asc' | 'precio_desc' | 'votos'
 
 function getFavs(): number[] {
   try { return JSON.parse(localStorage.getItem('favs') || '[]') } catch { return [] }
@@ -26,6 +26,14 @@ function toggleFav(id: number): number[] {
   localStorage.setItem('favs', JSON.stringify(next))
   return next
 }
+function getVoterId(): string {
+  let id = localStorage.getItem('voter_id')
+  if (!id) { id = crypto.randomUUID(); localStorage.setItem('voter_id', id) }
+  return id
+}
+function getVotedSet(): Set<number> {
+  try { return new Set(JSON.parse(localStorage.getItem('voted_products') || '[]')) } catch { return new Set() }
+}
 
 export default function CatalogPublic() {
   const [productos, setProductos]   = useState<Producto[]>([])
@@ -35,14 +43,17 @@ export default function CatalogPublic() {
   const [sort, setSort]             = useState<SortOption>('nuevos')
   const [minPrecio, setMinPrecio]   = useState('')
   const [maxPrecio, setMaxPrecio]   = useState('')
-  const [showFavs, setShowFavs]     = useState(false)
-  const [favs, setFavs]             = useState<number[]>([])
-  const [loading, setLoading]       = useState(true)
-  const [qcProducto, setQcProducto] = useState<{ producto: Producto; fotos: string[] } | null>(null)
-  const [banner, setBanner]         = useState('')
+  const [showFavs, setShowFavs]       = useState(false)
+  const [favs, setFavs]               = useState<number[]>([])
+  const [loading, setLoading]         = useState(true)
+  const [qcProducto, setQcProducto]   = useState<{ producto: Producto; fotos: string[] } | null>(null)
+  const [banner, setBanner]           = useState('')
+  const [votedProducts, setVotedProducts] = useState<Set<number>>(new Set())
+  const [votingId, setVotingId]       = useState<number | null>(null)
 
   useEffect(() => {
     setFavs(getFavs())
+    setVotedProducts(getVotedSet())
     async function fetchAll() {
       const PAGE = 1000
       let all: Producto[] = []
@@ -79,6 +90,28 @@ export default function CatalogPublic() {
 
   const handleFav = (id: number) => setFavs(toggleFav(id))
 
+  const handleVote = useCallback(async (productId: number) => {
+    if (votedProducts.has(productId) || votingId === productId) return
+    setVotingId(productId)
+    try {
+      const res = await fetch('/api/votar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ producto_id: productId, voter_id: getVoterId() })
+      })
+      if (res.ok) {
+        setProductos(prev => prev.map(p => p.id === productId ? { ...p, voto_count: (p.voto_count || 0) + 1 } : p))
+        setVotedProducts(prev => {
+          const next = new Set(prev)
+          next.add(productId)
+          localStorage.setItem('voted_products', JSON.stringify([...next]))
+          return next
+        })
+      }
+    } catch {}
+    setVotingId(null)
+  }, [votedProducts, votingId])
+
   const handleClick = useCallback(async (productoId: number) => {
     await supabase.from('clicks').insert([{ producto_id: productoId }])
   }, [])
@@ -113,6 +146,7 @@ export default function CatalogPublic() {
 
     if (sort === 'precio_asc')  list.sort((a, b) => a.precio - b.precio)
     if (sort === 'precio_desc') list.sort((a, b) => b.precio - a.precio)
+    if (sort === 'votos')       list.sort((a, b) => (b.voto_count || 0) - (a.voto_count || 0))
 
     return list
   }, [productos, categoria, search, sort, minPrecio, maxPrecio, favs])
@@ -179,6 +213,7 @@ export default function CatalogPublic() {
             style={{ background: 'var(--bg3)', border: '1px solid var(--border)', borderRadius: 10, padding: '10px 12px', color: 'var(--white)', fontSize: 13, fontFamily: 'DM Sans, sans-serif', outline: 'none' }}
           >
             <option value="nuevos">Más nuevos</option>
+            <option value="votos">Más votados</option>
             <option value="precio_asc">Precio: menor a mayor</option>
             <option value="precio_desc">Precio: mayor a menor</option>
           </select>
@@ -239,6 +274,13 @@ export default function CatalogPublic() {
                       >
                         {config.btn_buy_text}
                       </a>
+                      <button
+                        onClick={() => handleVote(p.id!)}
+                        disabled={votedProducts.has(p.id!) || votingId === p.id}
+                        className={`vote-btn${votedProducts.has(p.id!) ? ' voted' : ''}`}
+                      >
+                        ▲ {p.voto_count || 0}
+                      </button>
                       <QCButton
                         fotosQc={[]}
                         onOpen={(fotos) => setQcProducto({ producto: p, fotos })}
