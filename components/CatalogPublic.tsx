@@ -7,6 +7,7 @@ import WelcomePopup from './WelcomePopup'
 import QCModal from './QCModal'
 import SugerenciasForm from './SugerenciasForm'
 import QCButton from './QCButton'
+import FotoCarrusel from './FotoCarrusel'
 
 const REGISTER_URL = 'https://www.cssbuy.com/toctoc'
 
@@ -260,18 +261,18 @@ export default function CatalogPublic() {
                 <div className="empty"><div style={{ fontSize: 40, marginBottom: 12 }}>📦</div><p>No hay productos</p></div>
               ) : filtered.map(p => {
                 const isFav = favs.includes(p.id!)
+                const fotos: string[] = (() => {
+                  try { const arr = JSON.parse(p.fotos || '[]'); return arr.length > 0 ? arr : [p.imagen].filter(Boolean) } catch { return [p.imagen].filter(Boolean) }
+                })()
                 return (
                   <div className="card" key={p.id}>
                     <div className="card-img-wrap">
-                      {p.imagen
-                        ? <img src={proxyImg(p.imagen)} alt={p.nombre} className="card-img" onError={e => { (e.target as HTMLImageElement).style.display = 'none' }} />
-                        : <div className="card-img" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--muted)' }}>Sin imagen</div>
-                      }
+                      <FotoCarrusel fotos={fotos} nombre={p.nombre} />
                       {p.destacado && <div className="featured-badge">★ DESTACADO</div>}
                       {/* Botón favorito */}
                       <button
                         onClick={() => handleFav(p.id!)}
-                        style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isFav ? '#ff6b6b' : '#fff', transition: 'all 0.2s' }}
+                        style={{ position: 'absolute', top: 8, right: 8, background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%', width: 28, height: 28, cursor: 'pointer', fontSize: 14, display: 'flex', alignItems: 'center', justifyContent: 'center', color: isFav ? '#ff6b6b' : '#fff', transition: 'all 0.2s', zIndex: 2 }}
                       >
                         {isFav ? '♥' : '♡'}
                       </button>

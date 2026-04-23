@@ -12,6 +12,7 @@ export type Producto = {
   categoria: string
   marca: string
   imagen: string
+  fotos?: string
   link_cssbuy: string
   link_cssbuy_2?: string
   destacado: boolean
